@@ -6,7 +6,7 @@
             <h2 class="text-4xl font-bold mb-6 text-white">Create Your Account</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="flex flex-col bg-gray-200 rounded-3xl p-6">
+                <div class="flex flex-col bg-gray-100 rounded-3xl p-6">
                     <h3 class="text-lg font-semibold mb-4">Sign Up</h3>
                     <form action="#" method="POST">
                         <label for="name" class="block text-sm">Name *</label>
