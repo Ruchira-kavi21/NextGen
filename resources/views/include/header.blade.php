@@ -23,8 +23,8 @@
                     
                     <div class="absolute hidden bg-gray-900 shadow-md rounded-lg mt-2 w-48 group-hover:block">
                         <a class="block px-4 py-2 hover:bg-gray-950" href="/login">Login</a>
-                        <a class="block px-4 py-2 hover:bg-gray-950" href="#">Logout</a>
-                        <a class="block px-4 py-2 hover:bg-gray-950" href="#">Profile</a>
+                        <a class="block px-4 py-2 hover:bg-gray-950" href="/login">Logout</a>
+                        <a class="block px-4 py-2 hover:bg-gray-950" href="/profile">Profile</a>
                     </div>
                 </div>
             </div>

@@ -18,3 +18,6 @@ Route::get('/index', function(){
 Route::get('/profile', function(){
     return view('profile');
 });
+Route::get('/editprofile', function(){
+    return view('editprofile');
+});
