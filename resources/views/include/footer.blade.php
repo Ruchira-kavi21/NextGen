@@ -46,7 +46,8 @@
 
       <div class="flex justify-center items-center mt-8 border-t-2 border-gray-700 pt-8">
         <div class="flex items-center mr-8">
-          <img src="{{ asset('images/logo.png') }}" alt="NextGen Computing Logo" class="w-24">
+          <!-- <img src="{{ asset('images/logo.png') }}" alt="NextGen Computing Logo" class="w-24"> -->
+          <p class="text-gray-400 mb-4">NextGen Computing</p>
         </div>
         <div class="space-x-6">
           <a href="#" class="text-gray-400 hover:text-red-500"><i class="fab fa-facebook-f"></i></a>

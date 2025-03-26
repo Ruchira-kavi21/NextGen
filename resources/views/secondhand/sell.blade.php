@@ -28,7 +28,6 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <!-- Header with Back Button -->
     <header class="bg-gray-900 p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
             <a href="{{ route('secondhand.index') }}" class="text-white hover:text-gray-300">
@@ -45,10 +44,8 @@
 
     <div class="min-h-screen bg-gray-900 p-6 flex items-center justify-center">
         <div class="w-full max-w-2xl">
-            <!-- Form Heading -->
             <h3 class="text-xl font-semibold text-white mb-6 text-center">Sell a Part</h3>
 
-            <!-- Display Success/Error Messages -->
             @if (session('success'))
                 <div class="bg-green-500 text-white p-3 rounded-lg mb-4">
                     {{ session('success') }}
@@ -60,11 +57,9 @@
                 </div>
             @endif
 
-            <!-- Sell Form -->
             <form action="{{ route('secondhand.sell.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
-                <!-- Part Name -->
                 <div class="mb-6">
                     <label for="part_name" class="block text-white font-semibold mb-1">Part Name</label>
                     <input type="text" name="part_name" id="part_name" class="p-2 @error('part_name') border-red-500 @enderror" value="{{ old('part_name') }}" placeholder="e.g., Graphics Card" required>
@@ -73,7 +68,6 @@
                     @enderror
                 </div>
 
-                <!-- Description -->
                 <div class="mb-6">
                     <label for="description" class="block text-white font-semibold mb-1">Description</label>
                     <textarea name="description" id="description" class="p-2 @error('description') border-red-500 @enderror" rows="4" placeholder="e.g., NVIDIA GTX 1080, used for 2 years, good condition">{{ old('description') }}</textarea>
@@ -82,7 +76,6 @@
                     @enderror
                 </div>
 
-                <!-- Price -->
                 <div class="mb-6">
                     <label for="price" class="block text-white font-semibold mb-1">Price (LKR)</label>
                     <input type="number" name="price" id="price" step="0.01" class="p-2 @error('price') border-red-500 @enderror" value="{{ old('price') }}" placeholder="e.g., 15000.00" required>
@@ -91,7 +84,6 @@
                     @enderror
                 </div>
 
-                <!-- Image 1 -->
                 <div class="mb-6">
                     <label for="image1" class="block text-white font-semibold mb-1">Image 1 (Optional)</label>
                     <input type="file" name="image1" id="image1" class="p-2 @error('image1') border-red-500 @enderror">
@@ -100,7 +92,6 @@
                     @enderror
                 </div>
 
-                <!-- Image 2 -->
                 <div class="mb-6">
                     <label for="image2" class="block text-white font-semibold mb-1">Image 2 (Optional)</label>
                     <input type="file" name="image2" id="image2" class="p-2 @error('image2') border-red-500 @enderror">
@@ -109,7 +100,6 @@
                     @enderror
                 </div>
 
-                <!-- Image 3 -->
                 <div class="mb-6">
                     <label for="image3" class="block text-white font-semibold mb-1">Image 3 (Optional)</label>
                     <input type="file" name="image3" id="image3" class="p-2 @error('image3') border-red-500 @enderror">
@@ -118,7 +108,6 @@
                     @enderror
                 </div>
 
-                <!-- Submit Button -->
                 <div class="text-center">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-full">Submit for Review</button>
                 </div>

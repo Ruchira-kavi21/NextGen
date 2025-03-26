@@ -75,7 +75,6 @@
 
     <div class="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar -->
             <div class="lg:w-1/4">
                 <div class="sidebar rounded-xl p-6">
                     <h3 class="text-lg font-semibold mb-6">Account Hub</h3>
@@ -86,7 +85,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center text-gray-300 hover:text-white py-3 px-4 rounded-lg">
+                            <a href="{{ route('customer.orders') }}" class="flex items-center text-gray-300 hover:text-white py-3 px-4 rounded-lg">
                                 <i class="fas fa-box mr-3 text-primary"></i> Orders
                             </a>
                         </li>
@@ -94,11 +93,9 @@
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="lg:w-3/4">
                 <h2 class="text-4xl font-bold mb-8 main-heading">My Dashboard</h2>
 
-                <!-- Profile Picture Section -->
                 <div class="card p-6 mb-8">
                     <h3 class="text-lg font-semibold mb-4">Profile Picture</h3>
                     <div class="flex items-center">
@@ -109,7 +106,6 @@
                     </div>
                 </div>
 
-                <!-- Account Information Section -->
                 <div class="card p-6 mb-8">
                     <h3 class="text-lg font-semibold mb-4">Account Information</h3>
                     <p class="font-medium text-gray-400 mb-2">Contact Information</p>
@@ -121,7 +117,6 @@
                     </div>
                 </div>
 
-                <!-- Address Book Section -->
                 <div class="card p-6">
                     <h3 class="text-lg font-semibold mb-4">Address Book</h3>
                     <p class="font-medium text-gray-400 mb-2">Default Shipping Address</p>

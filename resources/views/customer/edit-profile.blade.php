@@ -99,7 +99,6 @@
 
     <div class="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar -->
             <div class="lg:w-1/4">
                 <div class="sidebar rounded-xl p-6">
                     <h3 class="text-lg font-semibold mb-6">Account Hub</h3>
@@ -110,7 +109,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center text-gray-300 hover:text-white py-3 px-4 rounded-lg">
+                            <a href="{{ route('customer.orders') }}" class="flex items-center text-gray-300 hover:text-white py-3 px-4 rounded-lg">
                                 <i class="fas fa-box mr-3 text-primary"></i> Orders
                             </a>
                         </li>
@@ -118,7 +117,6 @@
                 </div>
             </div>
 
-            <!-- Main Content -->
             <div class="lg:w-3/4">
                 <h2 class="text-4xl font-bold mb-8 main-heading">Edit Profile</h2>
 

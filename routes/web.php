@@ -36,6 +36,7 @@ Route::middleware(['auth:customer'])->group(function () {
     Route::get('/customer/profile', [CustomerController::class, 'profile'])->name('customer.profile');
     Route::get('/customer/edit-profile', [CustomerController::class, 'editProfile'])->name('customer.edit_profile');
     Route::put('/customer/profile', [CustomerController::class, 'updateProfile'])->name('customer.update_profile');
+    Route::get('/customer/orders', [CustomerController::class, 'orders'])->name('customer.orders')->middleware('auth:customer');
 });
 
 Route::get('/secondhand', [SecondHandPartController::class, 'index'])->name('secondhand.index');
@@ -44,6 +45,7 @@ Route::post('/secondhand', [SecondHandPartController::class, 'store'])->name('se
 Route::get('/secondhand/{id}', [SecondHandPartController::class, 'show'])->name('secondhand.show');
 Route::post('/secondhand/{id}/buy', [SecondHandPartController::class, 'buy'])->name('secondhand.buy');
 Route::get('/secondhand/{id}/buy', [SecondHandPartController::class, 'showBuyForm'])->name('secondhand.buy_form');
+
 
 Route::middleware([\App\Http\Middleware\SellerAuth::class])->group(function () {
     Route::get('/sellers/parts/{id}/edit', [SellerController::class, 'editPart'])->name('seller.edit_part'); // Added

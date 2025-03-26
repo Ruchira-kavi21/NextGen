@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Stripe JS -->
     <script src="https://js.stripe.com/v3/"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
@@ -104,7 +103,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header p-4 flex justify-between items-center">
         <div class="flex items-center space-x-4">
             <a href="{{ route('secondhand.show', $part->id) }}" class="text-white hover:text-gray-300">
@@ -120,22 +118,18 @@
 
     <div class="min-h-screen p-6 flex items-center justify-center">
         <div class="w-full max-w-2xl">
-            <!-- Form Heading -->
             <div class="card p-8">
                 <h3 class="text-xl font-semibold mb-6 text-center">Buy Components</h3>
 
-                <!-- Display Success/Error Messages -->
                 @if (session('error'))
                     <div class="bg-red-900/50 text-red-300 rounded-xl p-4 mb-6 text-center border border-red-700/50">
                         {{ session('error') }}
                     </div>
                 @endif
 
-                <!-- Buy Form -->
                 <form action="{{ route('secondhand.buy', $part->id) }}" method="POST" id="payment-form">
                     @csrf
 
-                    <!-- Customer Name -->
                     <div class="mb-6">
                         <label for="first_name" class="block text-gray-300 font-medium mb-2">Customer Name</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -150,7 +144,6 @@
                         @enderror
                     </div>
 
-                    <!-- Email -->
                     <div class="mb-6">
                         <label for="email" class="block text-gray-300 font-medium mb-2">Email</label>
                         <input type="email" name="email" id="email" class="w-full @error('email') border-red-500 @enderror" value="{{ old('email') }}" required>
@@ -159,7 +152,6 @@
                         @enderror
                     </div>
 
-                    <!-- Contact Number -->
                     <div class="mb-6">
                         <label for="phone_number" class="block text-gray-300 font-medium mb-2">Contact Number</label>
                         <input type="text" name="phone_number" id="phone_number" class="w-full @error('phone_number') border-red-500 @enderror" value="{{ old('phone_number') }}">
@@ -168,7 +160,6 @@
                         @enderror
                     </div>
 
-                    <!-- Country -->
                     <div class="mb-6">
                         <label for="country" class="block text-gray-300 font-medium mb-2">Country</label>
                         <input type="text" name="country" id="country" class="w-full @error('country') border-red-500 @enderror" value="{{ old('country', 'Sri Lanka') }}" readonly>
@@ -177,11 +168,10 @@
                         @enderror
                     </div>
 
-                    <!-- Province -->
                     <div class="mb-6">
                         <label for="province" class="block text-gray-300 font-medium mb-2">Province</label>
                         <select name="province" id="province" class="w-full @error('province') border-red-500 @enderror">
-                            <option value="">Select Province</option>
+                            <option value="" class="text-gray-300">Select Province</option>
                             <option value="Central" {{ old('province') == 'Central' ? 'selected' : '' }}>Central</option>
                             <option value="Eastern" {{ old('province') == 'Eastern' ? 'selected' : '' }}>Eastern</option>
                             <option value="North Central" {{ old('province') == 'North Central' ? 'selected' : '' }}>North Central</option>
@@ -197,7 +187,6 @@
                         @enderror
                     </div>
 
-                    <!-- District -->
                     <div class="mb-6">
                         <label for="district" class="block text-gray-300 font-medium mb-2">District</label>
                         <select name="district" id="district" class="w-full @error('district') border-red-500 @enderror">
@@ -251,7 +240,6 @@
                         @enderror
                     </div>
 
-                    <!-- Zip Code -->
                     <div class="mb-6">
                         <label for="Zipcode" class="block text-gray-300 font-medium mb-2">Zip Code</label>
                         <input type="text" name="Zipcode" id="Zipcode" class="w-full @error('Zipcode') border-red-500 @enderror" value="{{ old('Zipcode') }}">
@@ -260,7 +248,6 @@
                         @enderror
                     </div>
 
-                    <!-- Payment Option -->
                     <div class="mb-6">
                         <label class="block text-gray-300 font-medium mb-2">Payment Option</label>
                         <div class="flex space-x-6">
@@ -282,20 +269,17 @@
                         @enderror
                     </div>
 
-                    <!-- Stripe Card Element -->
                     <div class="mb-6">
                         <label for="card-element" class="block text-gray-300 font-medium mb-2">Card Details</label>
                         <div id="card-element"></div>
                         <div id="card-errors" class="text-red-400 text-sm mt-1"></div>
                     </div>
 
-                    <!-- Component Price -->
                     <div class="mb-6">
                         <label class="block text-gray-300 font-medium mb-2">Component Price</label>
                         <input type="text" class="w-full" value="{{ number_format($part->price, 2) }} LKR" readonly>
                     </div>
 
-                    <!-- Verify Product -->
                     <div class="mb-6">
                         <label class="block text-gray-300 font-medium mb-2">Verify Product (Extra 10% charges from product price)</label>
                         <div class="flex space-x-6">
@@ -313,20 +297,17 @@
                         @enderror
                     </div>
 
-                    <!-- Shipping Charges -->
                     <div class="mb-6">
                         <label for="shipping_charges" class="block text-gray-300 font-medium mb-2">Shipping Charges</label>
                         <input type="text" name="shipping_charges" id="shipping_charges" class="w-full" value="{{ old('shipping_charges', '0.00') }}" readonly>
                     </div>
 
-                    <!-- Total Cost -->
                     <div class="mb-6">
                         <label class="block text-gray-300 font-medium mb-2">Total Cost</label>
                         <input type="text" id="total_cost" name="total_cost" class="w-full" value="{{ number_format($part->price, 2) }} LKR" readonly>
                         <input type="hidden" id="total_cost_hidden" name="total_cost_hidden" value="{{ $part->price }}">
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="text-center">
                         <button type="submit" class="btn-primary text-white py-2 px-6 rounded-full" id="submit-button">Buy</button>
                     </div>
@@ -335,136 +316,132 @@
         </div>
     </div>
 
-    <!-- JavaScript for Total Cost, Dynamic District Dropdown, and Stripe -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Total Cost Calculation
-        const verifyProductRadios = document.querySelectorAll('input[name="verify_product"]');
-        const componentPrice = {{ $part->price }};
-        const shippingChargesInput = document.getElementById('shipping_charges');
-        const totalCostInput = document.getElementById('total_cost');
-        const totalCostHiddenInput = document.getElementById('total_cost_hidden');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Total Cost Calculation
+            const verifyProductRadios = document.querySelectorAll('input[name="verify_product"]');
+            const componentPrice = {{ $part->price }};
+            const shippingChargesInput = document.getElementById('shipping_charges');
+            const totalCostInput = document.getElementById('total_cost');
+            const totalCostHiddenInput = document.getElementById('total_cost_hidden');
 
-        const shippingCharges = 0.00;
-        shippingChargesInput.value = shippingCharges.toFixed(2);
+            const shippingCharges = 0.00;
+            shippingChargesInput.value = shippingCharges.toFixed(2);
 
-        function calculateTotalCost() {
-            const verifyProduct = document.querySelector('input[name="verify_product"]:checked').value === '1';
-            const verifyCost = verifyProduct ? componentPrice * 0.10 : 0;
-            const totalCost = componentPrice + verifyCost + shippingCharges;
-            totalCostInput.value = totalCost.toFixed(2) + ' LKR';
-            totalCostHiddenInput.value = totalCost.toFixed(2);
-        }
-
-        verifyProductRadios.forEach(radio => {
-            radio.addEventListener('change', calculateTotalCost);
-        });
-
-        calculateTotalCost();
-
-        // Dynamic District Dropdown
-        const provinceSelect = document.getElementById('province');
-        const districtSelect = document.getElementById('district');
-        const districtsByProvince = {
-            'Central': ['Kandy', 'Matale', 'Nuwara Eliya'],
-            'Eastern': ['Ampara', 'Batticaloa', 'Trincomalee'],
-            'North Central': ['Anuradhapura', 'Polonnaruwa'],
-            'Northern': ['Jaffna', 'Kilinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
-            'North Western': ['Kurunegala', 'Puttalam'],
-            'Sabaragamuwa': ['Kegalle', 'Ratnapura'],
-            'Southern': ['Galle', 'Hambantota', 'Matara'],
-            'Uva': ['Badulla', 'Moneragala'],
-            'Western': ['Colombo', 'Gampaha', 'Kalutara']
-        };
-
-        provinceSelect.addEventListener('change', function () {
-            const selectedProvince = this.value;
-            districtSelect.innerHTML = '<option value="">Select District</option>';
-
-            if (selectedProvince && districtsByProvince[selectedProvince]) {
-                districtsByProvince[selectedProvince].forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district;
-                    option.textContent = district;
-                    districtSelect.appendChild(option);
-                });
+            function calculateTotalCost() {
+                const verifyProduct = document.querySelector('input[name="verify_product"]:checked').value === '1';
+                const verifyCost = verifyProduct ? componentPrice * 0.10 : 0;
+                const totalCost = componentPrice + verifyCost + shippingCharges;
+                totalCostInput.value = totalCost.toFixed(2) + ' LKR';
+                totalCostHiddenInput.value = totalCost.toFixed(2);
             }
-        });
 
-        if (provinceSelect.value) {
-            provinceSelect.dispatchEvent(new Event('change'));
-        }
+            verifyProductRadios.forEach(radio => {
+                radio.addEventListener('change', calculateTotalCost);
+            });
 
-        // Stripe Integration
-        const stripe = Stripe('{{ env('STRIPE_KEY') }}');
-        const elements = stripe.elements();
-        const cardElement = elements.create('card', {
-            style: {
-                base: {
-                    color: '#e2e8f0',
-                    fontFamily: '"Roboto", sans-serif',
-                    fontSize: '16px',
-                    '::placeholder': {
-                        color: '#a0aec0',
+            calculateTotalCost();
+
+            const provinceSelect = document.getElementById('province');
+            const districtSelect = document.getElementById('district');
+            const districtsByProvince = {
+                'Central': ['Kandy', 'Matale', 'Nuwara Eliya'],
+                'Eastern': ['Ampara', 'Batticaloa', 'Trincomalee'],
+                'North Central': ['Anuradhapura', 'Polonnaruwa'],
+                'Northern': ['Jaffna', 'Kilinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
+                'North Western': ['Kurunegala', 'Puttalam'],
+                'Sabaragamuwa': ['Kegalle', 'Ratnapura'],
+                'Southern': ['Galle', 'Hambantota', 'Matara'],
+                'Uva': ['Badulla', 'Moneragala'],
+                'Western': ['Colombo', 'Gampaha', 'Kalutara']
+            };
+
+            provinceSelect.addEventListener('change', function () {
+                const selectedProvince = this.value;
+                districtSelect.innerHTML = '<option value="">Select District</option>';
+
+                if (selectedProvince && districtsByProvince[selectedProvince]) {
+                    districtsByProvince[selectedProvince].forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        districtSelect.appendChild(option);
+                    });
+                }
+            });
+
+            if (provinceSelect.value) {
+                provinceSelect.dispatchEvent(new Event('change'));
+            }
+
+            const stripe = Stripe('{{ env('STRIPE_KEY') }}');
+            const elements = stripe.elements();
+            const cardElement = elements.create('card', {
+                style: {
+                    base: {
+                        color: '#e2e8f0',
+                        fontFamily: '"Roboto", sans-serif',
+                        fontSize: '16px',
+                        '::placeholder': {
+                            color: '#a0aec0',
+                        },
                     },
-                },
-                invalid: {
-                    color: '#f56565',
-                },
-            },
-        });
-        cardElement.mount('#card-element');
-
-        const form = document.getElementById('payment-form');
-        const cardErrors = document.getElementById('card-errors');
-        const submitButton = document.getElementById('submit-button');
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            submitButton.disabled = true;
-            submitButton.textContent = 'Processing...';
-
-            console.log('Starting Stripe payment method creation');
-            const startTime = performance.now();
-
-            const { paymentIntent, error } = await stripe.createPaymentMethod({
-                type: 'card',
-                card: cardElement,
-                billing_details: {
-                    name: `${form.first_name.value} ${form.last_name.value}`,
-                    email: form.email.value,
-                    phone: form.phone_number.value,
-                    address: {
-                        country: form.country.value,
-                        state: form.province.value,
-                        city: form.district.value,
-                        postal_code: form.Zipcode.value,
+                    invalid: {
+                        color: '#f56565',
                     },
                 },
             });
+            cardElement.mount('#card-element');
 
-            const duration = performance.now() - startTime;
-            console.log(`Stripe payment method creation completed in ${duration}ms`);
+            const form = document.getElementById('payment-form');
+            const cardErrors = document.getElementById('card-errors');
+            const submitButton = document.getElementById('submit-button');
 
-            if (error) {
-                console.error('Stripe payment method creation failed:', error);
-                cardErrors.textContent = error.message;
-                submitButton.disabled = false;
-                submitButton.textContent = 'Buy';
-            } else {
-                console.log('Stripe payment method created successfully:', paymentIntent.id);
-                const paymentMethodId = paymentIntent.id;
-                const hiddenInput = document.createElement('input');
-                hiddenInput.setAttribute('type', 'hidden');
-                hiddenInput.setAttribute('name', 'payment_method');
-                hiddenInput.setAttribute('value', paymentMethodId);
-                form.appendChild(hiddenInput);
-                form.submit();
-            }
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                submitButton.disabled = true;
+                submitButton.textContent = 'Processing...';
+
+                console.log('Starting Stripe payment method creation');
+                const startTime = performance.now();
+
+                const { paymentIntent, error } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: {
+                        name: `${form.first_name.value} ${form.last_name.value}`,
+                        email: form.email.value,
+                        phone: form.phone_number.value,
+                        address: {
+                            country: form.country.value,
+                            state: form.province.value,
+                            city: form.district.value,
+                            postal_code: form.Zipcode.value,
+                        },
+                    },
+                });
+
+                const duration = performance.now() - startTime;
+                console.log(`Stripe payment method creation completed in ${duration}ms`);
+
+                if (error) {
+                    console.error('Stripe payment method creation failed:', error);
+                    cardErrors.textContent = error.message;
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Buy';
+                } else {
+                    console.log('Stripe payment method created successfully:', paymentIntent.id);
+                    const paymentMethodId = paymentIntent.id;
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.setAttribute('type', 'hidden');
+                    hiddenInput.setAttribute('name', 'payment_method');
+                    hiddenInput.setAttribute('value', paymentMethodId);
+                    form.appendChild(hiddenInput);
+                    form.submit();
+                }
+            });
         });
-    });
-</script>   
-
+    </script>   
     @include('include.footer')
 </body>
 </html>

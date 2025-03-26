@@ -17,7 +17,6 @@
         </div>
 
         <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-            <!-- Display Success/Error Messages -->
             @if (session('success'))
                 <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
                     {{ session('success') }}
@@ -29,7 +28,6 @@
                 </div>
             @endif
 
-            <!-- Images Section -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 @if($part->image1)
                     <img src="{{ asset('storage/' . $part->image1) }}" alt="{{ $part->part_name }} Image 1" class="w-full h-48 object-cover rounded-lg">
@@ -56,7 +54,6 @@
                 @endif
             </div>
 
-            <!-- Part Details -->
             <div class="text-gray-800">
                 <h3 class="text-2xl font-semibold mb-2">{{ $part->part_name }}</h3>
                 <p class="text-gray-600 mb-4">{{ $part->description ?? 'No description available.' }}</p>
@@ -81,7 +78,6 @@
                         Back to Market
                     </a>
 
-                    <!-- Buy Button (only show if status is Available) -->
                     @if($part->status === 'Available')
                         <a href="{{ route('secondhand.buy_form', $part->id) }}" class="inline-block bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg">
                             Buy Now

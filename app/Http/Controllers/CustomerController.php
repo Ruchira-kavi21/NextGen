@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Order;
 
 class CustomerController extends Controller
 {
@@ -52,5 +53,14 @@ class CustomerController extends Controller
         $customer->save();
 
         return redirect()->route('customer.profile')->with('success', 'Profile updated successfully!');
+    }
+    public function orders()
+    {
+        $customer = Auth::guard('customer')->user();
+        $orders = Order::where('customer_id', $customer->id)
+            ->with('part') 
+            ->orderBy('order_date', 'desc')
+            ->get();
+        return view('customer.orders', compact('orders', 'customer'));
     }
 }
