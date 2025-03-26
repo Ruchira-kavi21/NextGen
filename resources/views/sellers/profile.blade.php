@@ -4,7 +4,7 @@
     <div class="flex flex-col lg:flex-row mt-12">
         <div class="bg-gray-800 p-6 rounded-3xl lg:w-1/6 mr-6 ml-32">
             <div class="space-y-6">
-                <a href="#"class="flex items-center text-gray-300 hover:text-blue-500 hover:bg-gray-700 p-2 rounded-md transition-colors duration-200 font-semibold">
+                <a href="/editprofile"class="flex items-center text-gray-300 hover:text-blue-500 hover:bg-gray-700 p-2 rounded-md transition-colors duration-200 font-semibold">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" d="M12 12c2.75 0 5-2.25 5-5s-2.25-5-5-5-5 2.25-5 5 2.25 5 5 5zM12 14c-3.25 0-9 1.25-9 3.75V22h18v-4.25c0-2.5-5.75-3.75-9-3.75z"></path>
                     </svg>
