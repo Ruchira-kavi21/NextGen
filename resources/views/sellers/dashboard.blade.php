@@ -56,7 +56,7 @@
                     @foreach ($parts as $part)
                         <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition duration-200">
                             <!-- Part Name -->
-                            <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ $part->part_name }}</h4>
+                            <h4 class="text-lg font-bold text-gray-800 mb-2">{{ $part->part_name }}</h4>
 
                             <!-- Part Details -->
                             <div class="space-y-1 text-gray-600">
@@ -64,7 +64,7 @@
                                 <p><span class="font-medium">Status:</span> {{ $part->status }}</p>
                                 <p><span class="font-medium">Condition:</span> {{ $part->condition ?? 'N/A' }}</p>
                                 <p><span class="font-medium">Category:</span> {{ $part->category ?? 'N/A' }}</p>
-                                <p><span class="font-medium">Description:</span> {{ $part->description ?? 'N/A' }}</p>
+                                <!-- <p><span class="font-medium">Description:</span> {{ $part->description ?? 'N/A' }}</p> -->
                             </div>
 
                             <!-- Images -->

@@ -37,10 +37,10 @@
         <div>
           <h3 class="text-lg font-semibold mb-4 text-red-500">Contact us</h3>
           <p class="text-gray-400 mb-4">
-            <a href="NextGen@gmail.com" class="text-gray-400"><i class="fas fa-envelope mr-2"></i>contact@company.com</a>
+            <a href="NextGen@gmail.com" class="text-gray-400"><i class="fas fa-envelope mr-2"></i>NextGen_Computing@gmail.com</a>
           </p>
           <p class="text-gray-400 mb-4"><i class="fas fa-phone-alt mr-2"></i>+94 71 586 6790</p>
-          <p class="text-gray-400"><i class="fas fa-map-marker-alt mr-2"></i>794 McAllister St, San Francisco, 94102</p>
+          <p class="text-gray-400"><i class="fas fa-map-marker-alt mr-2"></i>APIIT, Union place, Colombo, Sri Lanka</p>
         </div>
       </div>
 

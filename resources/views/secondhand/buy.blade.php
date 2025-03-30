@@ -133,8 +133,8 @@
                     <div class="mb-6">
                         <label for="first_name" class="block text-gray-300 font-medium mb-2">Customer Name</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" name="first_name" id="first_name" class="w-full @error('first_name') border-red-500 @enderror" value="{{ old('first_name') }}" placeholder="First Name" required>
-                            <input type="text" name="last_name" id="last_name" class="w-full @error('last_name') border-red-500 @enderror" value="{{ old('last_name') }}" placeholder="Last Name" required>
+                            <input type="text" name="first_name" id="first_name" class="w-full @error('first_name') border-red-500 @enderror" value="{{ old('first_name', $customer ? $customer->first_name : '') }}" placeholder="First Name" required>
+                            <input type="text" name="last_name" id="last_name" class="w-full @error('last_name') border-red-500 @enderror" value="{{ old('last_name', $customer ? $customer->last_name : '') }}" placeholder="Last Name" required>
                         </div>
                         @error('first_name')
                             <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
@@ -143,10 +143,9 @@
                             <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-
                     <div class="mb-6">
                         <label for="email" class="block text-gray-300 font-medium mb-2">Email</label>
-                        <input type="email" name="email" id="email" class="w-full @error('email') border-red-500 @enderror" value="{{ old('email') }}" required>
+                        <input type="email" name="email" id="email" class="w-full @error('email') border-red-500 @enderror" value="{{ old('email', $customer ? $customer->email : '') }}" required>
                         @error('email')
                             <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -154,7 +153,7 @@
 
                     <div class="mb-6">
                         <label for="phone_number" class="block text-gray-300 font-medium mb-2">Contact Number</label>
-                        <input type="text" name="phone_number" id="phone_number" class="w-full @error('phone_number') border-red-500 @enderror" value="{{ old('phone_number') }}">
+                        <input type="text" name="phone_number" id="phone_number" class="w-full @error('phone_number') border-red-500 @enderror" value="{{ old('phone_number', $customer ? $customer->phone_number : '') }}">
                         @error('phone_number')
                             <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -317,131 +316,160 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Total Cost Calculation
-            const verifyProductRadios = document.querySelectorAll('input[name="verify_product"]');
-            const componentPrice = {{ $part->price }};
-            const shippingChargesInput = document.getElementById('shipping_charges');
-            const totalCostInput = document.getElementById('total_cost');
-            const totalCostHiddenInput = document.getElementById('total_cost_hidden');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Total Cost Calculation
+        const verifyProductRadios = document.querySelectorAll('input[name="verify_product"]');
+        const componentPrice = {{ $part->price }};
+        const shippingChargesInput = document.getElementById('shipping_charges');
+        const totalCostInput = document.getElementById('total_cost');
+        const totalCostHiddenInput = document.getElementById('total_cost_hidden');
 
-            const shippingCharges = 0.00;
-            shippingChargesInput.value = shippingCharges.toFixed(2);
+        const shippingCharges = 0.00;
+        shippingChargesInput.value = shippingCharges.toFixed(2);
 
-            function calculateTotalCost() {
-                const verifyProduct = document.querySelector('input[name="verify_product"]:checked').value === '1';
-                const verifyCost = verifyProduct ? componentPrice * 0.10 : 0;
-                const totalCost = componentPrice + verifyCost + shippingCharges;
-                totalCostInput.value = totalCost.toFixed(2) + ' LKR';
-                totalCostHiddenInput.value = totalCost.toFixed(2);
+        function calculateTotalCost() {
+            const verifyProduct = document.querySelector('input[name="verify_product"]:checked').value === '1';
+            const verifyCost = verifyProduct ? componentPrice * 0.10 : 0;
+            const totalCost = componentPrice + verifyCost + shippingCharges;
+            totalCostInput.value = totalCost.toFixed(2) + ' LKR';
+            totalCostHiddenInput.value = totalCost.toFixed(2);
+        }
+
+        verifyProductRadios.forEach(radio => {
+            radio.addEventListener('change', calculateTotalCost);
+        });
+
+        calculateTotalCost();
+
+        const provinceSelect = document.getElementById('province');
+        const districtSelect = document.getElementById('district');
+        const districtsByProvince = {
+            'Central': ['Kandy', 'Matale', 'Nuwara Eliya'],
+            'Eastern': ['Ampara', 'Batticaloa', 'Trincomalee'],
+            'North Central': ['Anuradhapura', 'Polonnaruwa'],
+            'Northern': ['Jaffna', 'Kilinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
+            'North Western': ['Kurunegala', 'Puttalam'],
+            'Sabaragamuwa': ['Kegalle', 'Ratnapura'],
+            'Southern': ['Galle', 'Hambantota', 'Matara'],
+            'Uva': ['Badulla', 'Moneragala'],
+            'Western': ['Colombo', 'Gampaha', 'Kalutara']
+        };
+
+        provinceSelect.addEventListener('change', function () {
+            const selectedProvince = this.value;
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+
+            if (selectedProvince && districtsByProvince[selectedProvince]) {
+                districtsByProvince[selectedProvince].forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
             }
+        });
 
-            verifyProductRadios.forEach(radio => {
-                radio.addEventListener('change', calculateTotalCost);
-            });
+        if (provinceSelect.value) {
+            provinceSelect.dispatchEvent(new Event('change'));
+        }
 
-            calculateTotalCost();
-
-            const provinceSelect = document.getElementById('province');
-            const districtSelect = document.getElementById('district');
-            const districtsByProvince = {
-                'Central': ['Kandy', 'Matale', 'Nuwara Eliya'],
-                'Eastern': ['Ampara', 'Batticaloa', 'Trincomalee'],
-                'North Central': ['Anuradhapura', 'Polonnaruwa'],
-                'Northern': ['Jaffna', 'Kilinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
-                'North Western': ['Kurunegala', 'Puttalam'],
-                'Sabaragamuwa': ['Kegalle', 'Ratnapura'],
-                'Southern': ['Galle', 'Hambantota', 'Matara'],
-                'Uva': ['Badulla', 'Moneragala'],
-                'Western': ['Colombo', 'Gampaha', 'Kalutara']
-            };
-
-            provinceSelect.addEventListener('change', function () {
-                const selectedProvince = this.value;
-                districtSelect.innerHTML = '<option value="">Select District</option>';
-
-                if (selectedProvince && districtsByProvince[selectedProvince]) {
-                    districtsByProvince[selectedProvince].forEach(district => {
-                        const option = document.createElement('option');
-                        option.value = district;
-                        option.textContent = district;
-                        districtSelect.appendChild(option);
-                    });
-                }
-            });
-
-            if (provinceSelect.value) {
-                provinceSelect.dispatchEvent(new Event('change'));
-            }
-
-            const stripe = Stripe('{{ env('STRIPE_KEY') }}');
-            const elements = stripe.elements();
-            const cardElement = elements.create('card', {
-                style: {
-                    base: {
-                        color: '#e2e8f0',
-                        fontFamily: '"Roboto", sans-serif',
-                        fontSize: '16px',
-                        '::placeholder': {
-                            color: '#a0aec0',
-                        },
-                    },
-                    invalid: {
-                        color: '#f56565',
+        const stripe = Stripe('{{ env('STRIPE_KEY') }}');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    color: '#e2e8f0',
+                    fontFamily: '"Roboto", sans-serif',
+                    fontSize: '16px',
+                    '::placeholder': {
+                        color: '#a0aec0',
                     },
                 },
-            });
-            cardElement.mount('#card-element');
+                invalid: {
+                    color: '#f56565',
+                },
+            },
+        });
+        cardElement.mount('#card-element');
 
-            const form = document.getElementById('payment-form');
-            const cardErrors = document.getElementById('card-errors');
-            const submitButton = document.getElementById('submit-button');
+        const form = document.getElementById('payment-form');
+        const cardErrors = document.getElementById('card-errors');
+        const submitButton = document.getElementById('submit-button');
 
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                submitButton.disabled = true;
-                submitButton.textContent = 'Processing...';
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
 
-                console.log('Starting Stripe payment method creation');
-                const startTime = performance.now();
+            const formData = {
+                first_name: form.first_name.value,
+                last_name: form.last_name.value,
+                email: form.email.value,
+                phone_number: form.phone_number.value,
+                country: form.country.value,
+                province: form.province.value,
+                district: form.district.value,
+                Zipcode: form.Zipcode.value,
+                payment_option: form.payment_option.value,
+                verify_product: form.verify_product.value,
+                shipping_charges: form.shipping_charges.value,
+                total_cost_hidden: form.total_cost_hidden.value,
+            };
 
-                const { paymentIntent, error } = await stripe.createPaymentMethod({
-                    type: 'card',
-                    card: cardElement,
-                    billing_details: {
-                        name: `${form.first_name.value} ${form.last_name.value}`,
-                        email: form.email.value,
-                        phone: form.phone_number.value,
-                        address: {
-                            country: form.country.value,
-                            state: form.province.value,
-                            city: form.district.value,
-                            postal_code: form.Zipcode.value,
+            try {
+                // Step 1: Create Payment Intent on the server
+                const response = await fetch('{{ route('secondhand.buy', $part->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                // Step 2: Confirm the payment with Stripe
+                const { paymentIntent, error } = await stripe.confirmCardPayment(result.clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: `${form.first_name.value} ${form.last_name.value}`,
+                            email: form.email.value,
+                            phone: form.phone_number.value,
+                            address: {
+                                country: form.country.value,
+                                state: form.province.value,
+                                city: form.district.value,
+                                postal_code: form.Zipcode.value,
+                            },
                         },
                     },
                 });
 
-                const duration = performance.now() - startTime;
-                console.log(`Stripe payment method creation completed in ${duration}ms`);
-
                 if (error) {
-                    console.error('Stripe payment method creation failed:', error);
-                    cardErrors.textContent = error.message;
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Buy';
-                } else {
-                    console.log('Stripe payment method created successfully:', paymentIntent.id);
-                    const paymentMethodId = paymentIntent.id;
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.setAttribute('type', 'hidden');
-                    hiddenInput.setAttribute('name', 'payment_method');
-                    hiddenInput.setAttribute('value', paymentMethodId);
-                    form.appendChild(hiddenInput);
-                    form.submit();
+                    throw new Error(error.message);
                 }
-            });
+
+                if (paymentIntent.status === 'succeeded') {
+                    window.location.href = '{{ route('secondhand.confirmation', ['payment_id' => '']) }}/' + result.paymentIntentId;
+                } else {
+                    throw new Error('Payment did not succeed. Status: ' + paymentIntent.status);
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                cardErrors.textContent = error.message;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Buy';
+            }
         });
-    </script>   
+    });
+</script>   
     @include('include.footer')
 </body>
 </html>

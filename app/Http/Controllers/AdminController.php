@@ -13,26 +13,22 @@ class AdminController extends Controller
 {
     public function dashboard(Request $request)
     {
-        // $admin = $request->session()->get('admin');
-        // if (!$admin) {
-        //     return redirect('/login')->with('error', 'Please log in to access the admin dashboard.');
-        // }
-
         $totalParts = SecondHandPart::count();
         $totalSellers = Seller::count();
         $totalCustomers = Customer::count();
-        $totalSales = SecondHandPart::where('status', 'Sold')->sum('price');
+        $totalSales = SecondHandPart::where('status', 'approved')->sum('price');
 
         $sellers = Seller::all();
         $customers = Customer::all();
-        $parts = SecondHandPart::with('seller')->get();
+        $parts = SecondHandPart::with('seller')->where('status', 'Available')->get();
+        $pendingParts = SecondHandPart::with('seller')->where('status', 'pending')->get();
 
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
         if ($startDate && $endDate) {
             $parts = SecondHandPart::whereBetween('created_at', [$startDate, $endDate])->with('seller')->get();
-            $totalSales = SecondHandPart::where('status', 'Sold')
+            $totalSales = SecondHandPart::where('status', 'Available')
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->sum('price');
         }
@@ -45,6 +41,7 @@ class AdminController extends Controller
             'sellers',
             'customers',
             'parts',
+            'pendingParts',
             'startDate',
             'endDate'
         ));
@@ -93,23 +90,23 @@ class AdminController extends Controller
         exit;
     }
 
-    public function approve($id)
-    {
-        $part = SecondHandPart::findOrFail($id);
-        $part->status = 'approved';
-        $part->save();
+    public function approvePart($id)
+{
+    $part = SecondHandPart::findOrFail($id);
+    $part->status = 'Available';
+    $part->save();
 
-        return redirect()->route('admin.dashboard')->with('success', 'Part approved successfully.');
-    }
+    return redirect()->route('admin.dashboard')->with('success', 'Part approved successfully.');
+}
 
-    public function decline($id)
-    {
-        $part = SecondHandPart::findOrFail($id);
-        $part->status = 'declined';
-        $part->save();
+public function declinePart($id)
+{
+    $part = SecondHandPart::findOrFail($id);
+    $part->status = 'declined';
+    $part->save();
 
-        return redirect()->route('admin.dashboard')->with('success', 'Part declined successfully.');
-    }
+    return redirect()->route('admin.dashboard')->with('success', 'Part declined successfully.');
+}
 
     // Add Seller
     public function addSeller(Request $request)
@@ -233,7 +230,7 @@ class AdminController extends Controller
             'part_name' => $request->input('part_name'),
             'seller_id' => $request->input('seller'),
             'price' => $request->input('price'),
-            'status' => $request->input('status'),
+            'status' => 'approved',
             'condition' => $request->input('condition'),
             'category' => $request->input('category'),
             'description' => $request->input('description'),
@@ -304,6 +301,25 @@ class AdminController extends Controller
         $part->save();
 
         return redirect()->route('admin.dashboard')->with('success', 'Part updated successfully.');
+    }
+    public function deletePart($id)
+    {
+        $part = SecondHandPart::findOrFail($id);
+
+        // Delete associated images from storage
+        if ($part->image1) {
+            Storage::disk('public')->delete($part->image1);
+        }
+        if ($part->image2) {
+            Storage::disk('public')->delete($part->image2);
+        }
+        if ($part->image3) {
+            Storage::disk('public')->delete($part->image3);
+        }
+
+        $part->delete();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Part deleted successfully.');
     }
 
     public function logout(Request $request)

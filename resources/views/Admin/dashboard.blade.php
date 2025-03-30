@@ -52,9 +52,8 @@
         <div class="mb-6">
             <button onclick="openAddPartModal()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">Add New Part</button>
         </div>
-
         <!-- Add Part Modal -->
-        <div id="addPartModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center" style="display: none;">
+        <div id="addPartModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden">
             <div class="w-full max-w-2xl mx-auto bg-gray-800 text-white p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto">
                 <h3 class="text-2xl font-semibold mb-4">Add New Part</h3>
                 <form action="{{ route('admin.add_part') }}" method="POST" enctype="multipart/form-data">
@@ -167,8 +166,8 @@
             </div>
         </div>
 
-        <!-- All Parts -->
-        <h3 class="text-2xl font-semibold mb-4">All Parts</h3>
+        <!-- Available Parts -->
+        <h3 class="text-2xl font-semibold mb-4">Available Parts</h3>
         @if ($parts->isEmpty())
             <p class="text-gray-400 mb-6">No parts to display.</p>
         @else
@@ -177,7 +176,7 @@
                     <thead>
                         <tr class="border-b border-gray-700">
                             <th class="py-3 px-4">Part Name</th>
-                            <th class="py-3 px-4">Description</th>
+                            <!-- <th class="py-3 px-4">Description</th> -->
                             <th class="py-3 px-4">Price</th>
                             <th class="py-3 px-4">Seller</th>
                             <th class="py-3 px-4">Status</th>
@@ -191,7 +190,54 @@
                         @foreach ($parts as $part)
                             <tr class="border-b border-gray-700">
                                 <td class="py-3 px-4">{{ $part->part_name }}</td>
-                                <td class="py-3 px-4">{{ $part->description ?? 'N/A' }}</td>
+                                <!-- <td class="py-3 px-4">{{ $part->description ?? 'N/A' }}</td> -->
+                                <td class="py-3 px-4">LKR {{ number_format($part->price, 2) }}</td>
+                                <td class="py-3 px-4">{{ $part->seller ? $part->seller->first_name . ' ' . $part->seller->last_name : 'N/A' }}</td>
+                                <td class="py-3 px-4">{{ $part->status }}</td>
+                                <td class="py-3 px-4">{{ $part->condition ?? 'N/A' }}</td>
+                                <td class="py-3 px-4">{{ $part->category ?? 'N/A' }}</td>
+                                <td class="py-3 px-4">
+                                    @if ($part->image1)
+                                        <img src="{{ asset('storage/' . $part->image1) }}" alt="Image 1" class="w-16 h-16 object-cover rounded">
+                                    @endif
+                                </td>
+                                <td class="py-3 px-4 flex space-x-2">
+                                    <button onclick="openEditPartModal({{ $part->id }}, '{{ addslashes($part->part_name) }}', '{{ addslashes($part->description ?? '') }}', {{ $part->price }}, {{ $part->seller_id ?? 'null' }}, '{{ $part->status }}', '{{ $part->condition ?? 'New' }}', '{{ $part->category ?? '' }}')" class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded-md">Edit</button>
+                                    <form action="{{ route('admin.delete_part', $part->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this part?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+
+        <h3 class="text-2xl font-semibold mb-4">Pending Parts for Approval</h3>
+        @if ($pendingParts->isEmpty())
+            <p class="text-gray-400 mb-6">No pending parts to review.</p>
+        @else
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="py-3 px-4">Part Name</th>
+                            <th class="py-3 px-4">Price</th>
+                            <th class="py-3 px-4">Seller</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4">Condition</th>
+                            <th class="py-3 px-4">Category</th>
+                            <th class="py-3 px-4">Images</th>
+                            <th class="py-3 px-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($pendingParts as $part)
+                            <tr class="border-b border-gray-700">
+                                <td class="py-3 px-4">{{ $part->part_name }}</td>
                                 <td class="py-3 px-4">LKR {{ number_format($part->price, 2) }}</td>
                                 <td class="py-3 px-4">{{ $part->seller ? $part->seller->first_name . ' ' . $part->seller->last_name : 'N/A' }}</td>
                                 <td class="py-3 px-4">{{ $part->status }}</td>
@@ -209,7 +255,14 @@
                                     @endif
                                 </td>
                                 <td class="py-3 px-4">
-                                <button onclick="openEditPartModal({{ $part->id }}, '{{ addslashes($part->part_name) }}', '{{ addslashes($part->description ?? '') }}', {{ $part->price }}, {{ $part->seller_id ?? 'null' }}, '{{ $part->status }}', '{{ $part->condition ?? 'New' }}', '{{ $part->category ?? '' }}')" class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded-md">Edit</button>
+                                    <form action="{{ route('admin.approve_part', $part->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md">Approve</button>
+                                    </form>
+                                    <form action="{{ route('admin.decline_part', $part->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md mt-4">Decline</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
@@ -560,9 +613,51 @@
                 </form>
             </div>
         </div>
+        <!-- Add New Admin -->
+        <h3 class="text-2xl font-semibold mb-4 mt-4">Add New Admin</h3>
+        <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+            <form action="{{ route('admin.add_admin') }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="first_name" class="block text-gray-300 font-bold mb-2">First Name</label>
+                        <input type="text" name="first_name" id="first_name" class="w-full p-2 rounded-md border border-gray-600 bg-gray-700 text-white @error('first_name') border-red-500 @enderror" value="{{ old('first_name') }}" required>
+                        @error('first_name')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label for="last_name" class="block text-gray-300 font-bold mb-2">Last Name</label>
+                        <input type="text" name="last_name" id="last_name" class="w-full p-2 rounded-md border border-gray-600 bg-gray-700 text-white @error('last_name') border-red-500 @enderror" value="{{ old('last_name') }}" required>
+                        @error('last_name')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-300 font-bold mb-2">Email</label>
+                        <input type="email" name="email" id="email" class="w-full p-2 rounded-md border border-gray-600 bg-gray-700 text-white @error('email') border-red-500 @enderror" value="{{ old('email') }}" required>
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="block text-gray-300 font-bold mb-2">Password</label>
+                        <input type="password" name="password" id="password" class="w-full p-2 rounded-md border border-gray-600 bg-gray-700 text-white @error('password') border-red-500 @enderror" required>
+                        @error('password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">Add Admin</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
+@include('include.footer')
 <script>
     function openAddPartModal() {
         document.getElementById('part_name').value = '';

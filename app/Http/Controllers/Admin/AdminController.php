@@ -44,22 +44,22 @@ class AdminController
 
      public function edit($id)
      {
-         $admin = Admin::findOrFail($id);
-         return view('Admins.edit', compact('admins'));
+        $admin = Admin::findOrFail($id);
+        return view('Admins.edit', compact('admins'));
      }
  
      public function update(Request $request, $id)
      {
-         $request->validate([
-             'first_name' => 'required',
-             'last_name' => 'required',
-             'email' => 'required|email|unique:admins,email,' . $id,
-         ]);
- 
-         $admin = Admin::findOrFail($id);
-         $admin->update($request->all());
- 
-         return redirect()->route('Admin.index');
+        $request->validate([
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:admins,email,' . $id,
+        ]);
+
+        $admin = Admin::findOrFail($id);
+        $admin->update($request->all());
+
+        return redirect()->route('Admin.index');
      }
  
      public function dashboard()
@@ -80,5 +80,24 @@ class AdminController
         $part = SecondHandPart::findOrFail($id);
         $part->update(['status' => 'Declined']);
         return redirect()->route('admin.dashboard')->with('success', 'Part declined successfully.');
+    }
+
+    public function addAdmin(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:admins,email',
+            'password' => 'required|string|min:8',
+        ]);
+
+        Admin::create([
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+        ]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Admin added successfully.');
     }
 }

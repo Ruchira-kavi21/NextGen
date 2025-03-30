@@ -9,11 +9,11 @@ use App\Http\Controllers\SellerController;
 use App\Http\Controllers\CustomerController;
 
 // Public routes
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+// Route::get('/index', function () {
+//     return view('index');
+// })->name('home');
 
-Route::get('/index', function () {
+Route::get('/', function () {
     return view('index');
 })->name('index');
 
@@ -40,12 +40,11 @@ Route::middleware(['auth:customer'])->group(function () {
 });
 
 Route::get('/secondhand', [SecondHandPartController::class, 'index'])->name('secondhand.index');
-Route::get('/secondhand/create', [SecondHandPartController::class, 'create'])->name('secondhand.create');
 Route::post('/secondhand', [SecondHandPartController::class, 'store'])->name('secondhand.store');
 Route::get('/secondhand/{id}', [SecondHandPartController::class, 'show'])->name('secondhand.show');
 Route::post('/secondhand/{id}/buy', [SecondHandPartController::class, 'buy'])->name('secondhand.buy');
 Route::get('/secondhand/{id}/buy', [SecondHandPartController::class, 'showBuyForm'])->name('secondhand.buy_form');
-
+Route::get('/secondhand/confirmation/{payment_id}', [SecondHandPartController::class, 'confirmation'])->name('secondhand.confirmation');
 
 Route::middleware([\App\Http\Middleware\SellerAuth::class])->group(function () {
     Route::get('/sellers/parts/{id}/edit', [SellerController::class, 'editPart'])->name('seller.edit_part'); // Added
@@ -74,6 +73,10 @@ Route::middleware([\App\Http\Middleware\AdminAuth::class])->group(function () {
     Route::post('/admin/edit-customer/{id}', [AdminController::class, 'editCustomer'])->name('admin.edit_customer');
     Route::post('/admin/add-part', [AdminController::class, 'addPart'])->name('admin.add_part');
     Route::post('/admin/edit-part/{id}', [AdminController::class, 'editPart'])->name('admin.edit_part');
+    Route::delete('/admin/delete-part/{id}', [AdminController::class, 'deletePart'])->name('admin.delete_part')->middleware('auth:admin');
+    Route::post('/admin/approve-part/{id}', [AdminController::class, 'approvePart'])->name('admin.approve_part')->middleware('auth:admin');
+    Route::post('/admin/decline-part/{id}', [AdminController::class, 'declinePart'])->name('admin.decline_part')->middleware('auth:admin');
+    Route::post('/admin/add-admin', [AdminController::class, 'addAdmin'])->name('admin.add_admin')->middleware('auth:admin');
 });
 Route::get('/editprofile', function () {
     return view('customer.editprofile');

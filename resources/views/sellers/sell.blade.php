@@ -38,8 +38,8 @@
                 <label for="status" class="block text-gray-300 font-bold mb-2">Status</label>
                 <select name="status" id="status" class="w-full p-3 rounded-md border border-gray-600 bg-gray-700 text-white @error('status') border-red-500 @enderror" required>
                     <option value="pending">Pending</option>
-                    <option value="Available">Available</option>
-                    <option value="Sold">Sold</option>
+                    <!-- <option value="Available">Available</option>
+                    <option value="Sold">Sold</option> -->
                 </select>
                 @error('status')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
