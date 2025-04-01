@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('province')->nullable();
             $table->string('district')->nullable();
             $table->string('Zipcode')->nullable();
-            $table->string('payment_option'); // Credit Card, Debit Card, PayPal
+            $table->string('payment_option'); 
             $table->string('card_details')->nullable();
             $table->boolean('verify_product')->default(false); // Yes/No
             $table->decimal('shipping_charges', 8, 2)->default(0.00);

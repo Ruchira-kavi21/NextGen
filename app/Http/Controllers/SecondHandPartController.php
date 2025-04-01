@@ -67,22 +67,29 @@ class SecondHandPartController extends Controller
         return redirect()->route('secondhand.show', $part->id)
             ->with('error', 'This part is not available for purchase.');
     }
-    $customer = Auth::guard('customer')->user(); // Get the logged-in customer
+
+    // Get the authenticated customer
+    $customer = Auth::guard('customer')->user();
+
+    // Log to debug
+    \Log::info('showBuyForm: Authenticated customer', ['customer' => $customer]);
+
     return view('secondhand.buy', compact('part', 'customer'));
 }
 
-public function buy(Request $request, $id)
+    public function buy(Request $request, $id)
 {
     \Log::info('Buy method started', ['id' => $id, 'request_data' => $request->all()]);
 
-    $startTime = microtime(true);
+    $startTime = microtime(true); // Start timing
 
     $part = SecondHandPart::findOrFail($id);
     \Log::info('Part fetched', ['part_id' => $id, 'duration' => microtime(true) - $startTime]);
 
     if ($part->status !== 'Available') {
         \Log::warning('Part not available', ['part_id' => $id, 'status' => $part->status]);
-        return response()->json(['error' => 'This part is no longer available for purchase.'], 400);
+        return redirect()->route('secondhand.show', $id)
+            ->with('error', 'This part is no longer available for purchase.');
     }
 
     // Validate the form data
@@ -101,6 +108,7 @@ public function buy(Request $request, $id)
             'verify_product' => 'required|in:0,1',
             'shipping_charges' => 'required|numeric|min:0',
             'total_cost_hidden' => 'required|numeric|min:0',
+            'payment_method' => 'required|string', // Stripe payment method ID
         ]);
         \Log::info('Validation passed', [
             'validated_data' => $validated,
@@ -111,7 +119,7 @@ public function buy(Request $request, $id)
             'errors' => $e->errors(),
             'duration' => microtime(true) - $validationStart
         ]);
-        return response()->json(['error' => 'Validation failed: ' . json_encode($e->errors())], 422);
+        throw $e;
     }
 
     // Calculate costs
@@ -128,6 +136,19 @@ public function buy(Request $request, $id)
         'duration' => microtime(true) - $calcStart
     ]);
 
+    // Construct shipping address
+    $addressStart = microtime(true);
+    $shippingAddress = implode(', ', array_filter([
+        $validated['district'],
+        $validated['province'],
+        $validated['country'],
+        $validated['Zipcode'],
+    ]));
+    \Log::info('Shipping address constructed', [
+        'shipping_address' => $shippingAddress,
+        'duration' => microtime(true) - $addressStart
+    ]);
+
     // Set up Stripe
     $stripeStart = microtime(true);
     Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -138,13 +159,11 @@ public function buy(Request $request, $id)
         $paymentStart = microtime(true);
         $paymentIntent = PaymentIntent::create([
             'amount' => $totalCost * 100, // Stripe expects amount in cents
-            'currency' => 'lkr',
-            'description' => "Payment for {$part->part_name}",
-            'metadata' => [
-                'part_id' => $part->id,
-                'customer_email' => $validated['email'],
-                'customer_id' => Auth::guard('customer')->id(),
-            ],
+            'currency' => 'lkr', // Use LKR for Sri Lankan Rupees (ensure Stripe supports this for your account)
+            'payment_method' => $validated['payment_method'],
+            'confirmation_method' => 'manual',
+            'confirm' => true,
+            'return_url' => route('secondhand.buy.success', $part->id), // Redirect URL after payment
         ]);
         \Log::info('PaymentIntent created', [
             'payment_intent_id' => $paymentIntent->id,
@@ -152,31 +171,72 @@ public function buy(Request $request, $id)
             'duration' => microtime(true) - $paymentStart
         ]);
 
-        return response()->json([
-            'clientSecret' => $paymentIntent->client_secret,
-            'paymentIntentId' => $paymentIntent->id,
+        // Check if payment requires further action (e.g., 3D Secure)
+        if ($paymentIntent->status === 'requires_action') {
+            \Log::info('Payment requires further action, redirecting for 3D Secure');
+            return redirect($paymentIntent->next_action->redirect_to_url->url);
+        }
+
+        // Payment successful, store the order
+        $orderStart = microtime(true);
+        $order = Order::create([
+            'customer_id' => Auth::guard('customer')->id(),
+            'part_id' => $part->id,
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'],
+            'country' => $validated['country'],
+            'province' => $validated['province'],
+            'district' => $validated['district'],
+            'zipcode' => $validated['Zipcode'],
+            'payment_option' => $validated['payment_option'],
+            'stripe_payment_id' => $paymentIntent->id,
+            'component_price' => $componentPrice,
+            'verify_product' => $validated['verify_product'],
+            'verify_cost' => $verifyCost,
+            'shipping_charges' => $shippingCharges,
+            'total' => $totalCost,
+            'status' => 'Completed',
+            'shipping_address' => $shippingAddress,
+            'payment_status' => 'Paid',
+            'order_date' => now(),
         ]);
+        \Log::info('Order created', [
+            'order_id' => $order->id,
+            'duration' => microtime(true) - $orderStart
+        ]);
+
+        // Update part status to "Sold"
+        $partUpdateStart = microtime(true);
+        $part->status = 'Sold';
+        $part->save();
+        \Log::info('Part status updated to Sold', [
+            'part_id' => $part->id,
+            'duration' => microtime(true) - $partUpdateStart
+        ]);
+
+        \Log::info('Buy method completed successfully', [
+            'total_duration' => microtime(true) - $startTime
+        ]);
+
+        return redirect()->route('secondhand.show', $part->id)
+            ->with('success', 'Purchase completed successfully!');
+
     } catch (\Exception $e) {
-        \Log::error('PaymentIntent creation failed', [
+        \Log::error('Payment failed', [
             'error' => $e->getMessage(),
             'duration' => microtime(true) - $stripeStart
         ]);
-        return response()->json(['error' => 'PaymentIntent creation failed: ' . $e->getMessage()], 500);
+        return redirect()->back()->with('error', 'Payment failed: ' . $e->getMessage());
     }
 }
-
-public function buySuccess($id)
-{
-    $part = SecondHandPart::findOrFail($id);
-    return redirect()->route('secondhand.show', $part->id)
-        ->with('success', 'Purchase completed successfully!');
-}
-public function confirmation($payment_id)
-{
-    $order = Order::where('stripe_payment_id', $payment_id)->firstOrFail();
-    $part = SecondHandPart::findOrFail($order->part_id);
-    return view('secondhand.confirmation', compact('order', 'part'));
-}
+    public function buySuccess($id)
+    {
+        $part = SecondHandPart::findOrFail($id);
+        return redirect()->route('secondhand.show', $part->id)
+            ->with('success', 'Purchase completed successfully!');
+    }
 
     public function showSellForm()
     {
